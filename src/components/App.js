@@ -1,42 +1,41 @@
-import React, { Component, useState } from "react";
-import '../styles/App.css';
-
-class App extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            renderBall: false,
-            posi : 0,
-            ballPosition: { left: "0px" }
-        };
-        this.renderChoice = this.renderBallOrButton.bind(this)
-        this.buttonClickHandler = this.buttonClickHandler.bind(this)
-    };
-
-    buttonClickHandler() {
-   
-   }
-    renderBallOrButton() {
-		if (this.state.renderBall) {
-		    return <div className="ball" style={this.state.ballPosition}></div>
-		} else {
-		    return <button onClick={this.buttonClickHandler} >Start</button>
-		}
+import React, { useState, useEffect, useCallback } from 'react';
+     
+const App = () => {
+  const [ballPosition, setBallPosition] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+ 
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === 'ArrowRight' && event.keyCode === 39) {
+      setBallPosition(prevPosition => prevPosition + 5);
     }
-
-    // bind ArrowRight keydown event
-    componentDidMount() {
-      
+  }, []);
+  
+  useEffect(() => {
+    if (gameStarted) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
     }
-
-    render() {
-        return (
-            <div className="playground">
-                {this.renderBallOrButton()}
-            </div>
-        )
-    }
+  }, [gameStarted, handleKeyDown]);
+ 
+  return (
+    <div>
+      {!gameStarted ? (
+        <button className="start" onClick={() => setGameStarted(true)}>Start</button>
+      ) : (
+        <div 
+          className="ball" 
+          style={{
+            position: 'absolute',
+            left: `${ballPosition}px`
+          }}
+        >
+          ⚪
+        </div>
+      )}
+    </div>
+  );
 }
-
-
+ 
 export default App;
